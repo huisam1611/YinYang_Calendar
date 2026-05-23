@@ -35,8 +35,15 @@ body {
 .app-header {
   background: linear-gradient(135deg, var(--jade-dark), var(--jade));
   color: #fff;
-  text-align: center;
-  padding: 24px 16px 20px;
+  padding: 20px 16px;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 820px;
+  margin: 0 auto;
 }
 
 .app-header h1 {
@@ -51,6 +58,23 @@ body {
   opacity: 0.85;
   margin-top: 2px;
   font-weight: 400;
+}
+
+.btn-script {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-script:hover {
+  background: rgba(255,255,255,0.28);
 }
 
 .main-layout {

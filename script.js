@@ -1,14 +1,48 @@
 (function () {
   'use strict';
 
-  var MONTH_NAMES = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  var WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
+
+  var S2T = {
+    '闰': '閏', '龙': '龍', '鸡': '雞', '猪': '豬', '马': '馬',
+    '岁': '歲', '苏': '蘇', '腊': '臘',
+    '双': '雙', '历': '曆', '农': '農', '仪': '儀',
+    '转': '轉', '换': '換', '选': '選', '择': '擇',
+    '输': '輸', '术': '術', '请': '請', '检': '檢',
+    '库': '庫', '载': '載', '败': '敗', '错': '錯', '误': '誤',
+    '网': '網', '络': '絡', '连': '連', '后': '後',
+    '无': '無', '对': '對', '应': '應', '为': '為',
+  };
 
   var state = { year: 0, month: 0 };
   var els = {};
   var SL = null;
+  var useTraditional = false;
+
+  function convertChinese(text) {
+    if (!useTraditional) return text;
+    var out = '';
+    for (var i = 0; i < text.length; i++) {
+      out += S2T[text[i]] || text[i];
+    }
+    return out;
+  }
+
+  function toggleScript() {
+    useTraditional = !useTraditional;
+    if (els.scriptToggle) {
+      els.scriptToggle.textContent = useTraditional ? '简体' : '繁體';
+    }
+    try { localStorage.setItem('calendar-script', useTraditional ? 't' : 's'); } catch (e) {}
+    updateStaticText();
+    renderCalendar();
+    var curTab = document.querySelector('.tab.active');
+    if (curTab) {
+      var panelId = curTab.dataset.panel;
+      if (panelId === 'solar2lunar' && els.solarDateInput && els.solarDateInput.value) convertSolarToLunar();
+      else if (panelId === 'lunar2solar') convertLunarToSolar();
+    }
+  }
 
   function resolveLunarLib() {
     if (typeof solarLunar === 'undefined' || solarLunar === null) return null;
@@ -17,11 +51,34 @@
     return null;
   }
 
+  function updateStaticText() {
+    if (els.legendMonthStart) els.legendMonthStart.textContent = convertChinese('农历月初');
+    if (els.legendLeap) els.legendLeap.textContent = convertChinese('闰月');
+    if (els.tabSolar2lunar) els.tabSolar2lunar.innerHTML = convertChinese('公历') + ' &rarr; ' + convertChinese('农历');
+    if (els.tabLunar2solar) els.tabLunar2solar.innerHTML = convertChinese('农历') + ' &rarr; ' + convertChinese('公历');
+    if (els.panelDescSolar) els.panelDescSolar.textContent = convertChinese('选择公历日期，查看对应农历信息。');
+    if (els.panelDescLunar) els.panelDescLunar.textContent = convertChinese('输入农历日期，转换为公历。');
+    if (els.labelSolarDate) els.labelSolarDate.textContent = convertChinese('公历日期：');
+    if (els.labelLunarYear) els.labelLunarYear.textContent = convertChinese('年份：');
+    if (els.labelLunarMonth) els.labelLunarMonth.textContent = convertChinese('月份：');
+    if (els.labelLunarDay) els.labelLunarDay.textContent = convertChinese('日期：');
+    if (els.labelLeap) {
+      els.labelLeap.innerHTML = convertChinese('闰月') + ' (<span class="chinese-leap-indicator">' + convertChinese('闰') + '</span>)';
+    }
+    if (els.title) els.title.textContent = convertChinese('双历仪表板');
+    if (els.subtitle) els.subtitle.textContent = convertChinese('公历 · 农历 双历仪表板');
+    if (els.footerTech) els.footerTech.textContent = convertChinese('技术支持');
+    if (els.sectionTitle) els.sectionTitle.textContent = convertChinese('日期转换');
+  }
+
   function init() {
     cacheElements();
     SL = resolveLunarLib();
+    try { useTraditional = localStorage.getItem('calendar-script') === 't'; } catch (e) {}
     populateSelects();
     updateLeapUI();
+    updateStaticText();
+    if (els.scriptToggle) els.scriptToggle.textContent = useTraditional ? '简体' : '繁體';
     var today = new Date();
     state.year = today.getFullYear();
     state.month = today.getMonth() + 1;
@@ -45,6 +102,22 @@
     els.lunarMonthInput = document.getElementById('lunar-month-input');
     els.lunarDayInput = document.getElementById('lunar-day-input');
     els.lunarLeapInput = document.getElementById('lunar-leap-input');
+    els.scriptToggle = document.getElementById('script-toggle');
+    els.legendMonthStart = document.querySelector('.legend-text-month');
+    els.legendLeap = document.querySelector('.legend-text-leap');
+    els.tabSolar2lunar = document.querySelector('.tab[data-panel="solar2lunar"]');
+    els.tabLunar2solar = document.querySelector('.tab[data-panel="lunar2solar"]');
+    els.panelDescSolar = document.querySelector('#panel-solar2lunar .panel-desc');
+    els.panelDescLunar = document.querySelector('#panel-lunar2solar .panel-desc');
+    els.labelSolarDate = document.querySelector('label[for="solar-date-input"]');
+    els.labelLunarYear = document.querySelector('label[for="lunar-year-input"]');
+    els.labelLunarMonth = document.querySelector('label[for="lunar-month-input"]');
+    els.labelLunarDay = document.querySelector('label[for="lunar-day-input"]');
+    els.labelLeap = document.querySelector('.checkbox-label');
+    els.title = document.querySelector('h1');
+    els.subtitle = document.querySelector('.app-subtitle');
+    els.sectionTitle = document.querySelector('.section-title');
+    els.footerTech = document.getElementById('footer-tech');
     els.tabs = document.querySelectorAll('.tab');
     els.panels = {
       solar2lunar: document.getElementById('panel-solar2lunar'),
@@ -108,7 +181,7 @@
     } catch (e) {
       if (els.calendarGrid) {
         els.calendarGrid.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--red)">' +
-          'Failed to render calendar. <br>Error: ' + e.message + '</div>';
+          '日历渲染失败。<br>错误：' + e.message + '</div>';
       }
     }
   }
@@ -117,7 +190,7 @@
     if (!SL) {
       if (els.calendarGrid) {
         els.calendarGrid.innerHTML = '<div style="grid-column:1/-1;padding:30px;text-align:center;color:var(--red)">' +
-          'Calendar library not loaded. Check your internet connection and refresh.</div>';
+          '日历库未加载，请检查网络连接后刷新。</div>';
       }
       if (els.calendarHeader) els.calendarHeader.textContent = '--';
       return;
@@ -125,7 +198,7 @@
 
     var year = state.year;
     var month = state.month;
-    if (els.calendarHeader) els.calendarHeader.textContent = MONTH_NAMES[month - 1] + ' ' + year;
+    if (els.calendarHeader) els.calendarHeader.textContent = year + '年' + month + '月';
 
     var firstDay = new Date(year, month - 1, 1).getDay();
     var daysInMonth = new Date(year, month, 0).getDate();
@@ -134,7 +207,7 @@
     var nextNorm = normalizeDate(year, month + 1);
 
     var html = '';
-    html += '<div class="day-header">Sun</div><div class="day-header">Mon</div><div class="day-header">Tue</div><div class="day-header">Wed</div><div class="day-header">Thu</div><div class="day-header">Fri</div><div class="day-header">Sat</div>';
+    html += '<div class="day-header">日</div><div class="day-header">一</div><div class="day-header">二</div><div class="day-header">三</div><div class="day-header">四</div><div class="day-header">五</div><div class="day-header">六</div>';
 
     var dayCount = 1, nextMonthDay = 1, started = false;
     for (var row = 0; row < 6; row++) {
@@ -183,6 +256,7 @@
       chineseClass += ' month-start';
     }
     if (lunar.isLeap) chineseClass += ' leap-month';
+    chineseText = convertChinese(chineseText);
 
     return '<div class="' + classes + '">' +
       '<span class="gregorian-date">' + day + '</span>' +
@@ -209,38 +283,41 @@
   }
 
   function convertSolarToLunar() {
-    if (!SL) { setResult('result-solar2lunar', 'Library not loaded. Check your internet connection.'); return; }
+    if (!SL) { setResult('result-solar2lunar', '库未加载，请检查网络连接。'); return; }
     var val = els.solarDateInput ? els.solarDateInput.value : '';
-    if (!val) { setResult('result-solar2lunar', 'Please select a date.'); return; }
+    if (!val) { setResult('result-solar2lunar', '请选择日期。'); return; }
     var parts = val.split('-');
     var lunar = SL.solar2lunar(parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2], 10));
-    if (!lunar || !lunar.dayCn) { setResult('result-solar2lunar', 'Conversion failed.'); return; }
-    var monthDay = lunar.monthCn + lunar.dayCn;
+    if (!lunar || !lunar.dayCn) { setResult('result-solar2lunar', '转换失败。'); return; }
+    var gzYear = convertChinese(lunar.gzYear);
+    var animal = convertChinese(lunar.animal);
+    var monthDay = convertChinese(lunar.monthCn + lunar.dayCn);
     setResult('result-solar2lunar',
-      '<div class="result-label">Chinese Calendar</div>' +
-      '<div class="result-text"><span class="result-gz">' + lunar.gzYear + '</span>年' +
-      '<span class="result-animal">(' + lunar.animal + ')</span> ' + monthDay + '</div>' +
+      '<div class="result-label">' + convertChinese('农历') + '</div>' +
+      '<div class="result-text"><span class="result-gz">' + gzYear + '</span>' + convertChinese('年') +
+      '<span class="result-animal">(' + animal + ')</span> ' + monthDay + '</div>' +
       '<button class="btn btn-secondary" data-jump-year="' + parts[0] + '" data-jump-month="' + parts[1] + '">' +
-      'Jump to this month in Calendar View</button>');
+      convertChinese('跳转到此月') + '</button>');
     bindJumpBtn('result-solar2lunar');
   }
 
   function convertLunarToSolar() {
-    if (!SL) { setResult('result-lunar2solar', 'Library not loaded. Check your internet connection.'); return; }
+    if (!SL) { setResult('result-lunar2solar', '库未加载，请检查网络连接。'); return; }
     var y = parseInt(els.lunarYearInput ? els.lunarYearInput.value : '', 10);
     var m = parseInt(els.lunarMonthInput ? els.lunarMonthInput.value : '', 10);
     var d = parseInt(els.lunarDayInput ? els.lunarDayInput.value : '', 10);
     var isLeap = els.lunarLeapInput ? els.lunarLeapInput.checked : false;
-    if (isNaN(y) || y < 1900 || y > 2100) { setResult('result-lunar2solar', 'Please enter a valid year (1900\u20132100).'); return; }
+    if (isNaN(y) || y < 1900 || y > 2100) { setResult('result-lunar2solar', '请输入有效年份（1900–2100）。'); return; }
     var solar = SL.lunar2solar(y, m, d, isLeap);
-    if (!solar || !solar.cDay) { setResult('result-lunar2solar', 'Conversion failed. The specified Chinese date may not exist.'); return; }
+    if (!solar || !solar.cDay) { setResult('result-lunar2solar', '转换失败，指定的农历日期可能不存在。'); return; }
     var dateObj = new Date(solar.cYear, solar.cMonth - 1, solar.cDay);
-    var formatted = dateObj.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    var locale = useTraditional ? 'zh-TW' : 'zh-CN';
+    var formatted = dateObj.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     setResult('result-lunar2solar',
-      '<div class="result-label">Gregorian Calendar</div>' +
+      '<div class="result-label">' + convertChinese('公历') + '</div>' +
       '<div class="result-text">' + formatted + '</div>' +
       '<button class="btn btn-secondary" data-jump-year="' + solar.cYear + '" data-jump-month="' + solar.cMonth + '">' +
-      'Jump to this month in Calendar View</button>');
+      convertChinese('跳转到此月') + '</button>');
     bindJumpBtn('result-lunar2solar');
   }
 
@@ -284,6 +361,7 @@
     });
     if (els.lunarYearInput) els.lunarYearInput.addEventListener('change', updateLeapUI);
     if (els.lunarMonthInput) els.lunarMonthInput.addEventListener('change', updateLeapUI);
+    if (els.scriptToggle) els.scriptToggle.addEventListener('click', toggleScript);
     [].forEach.call(els.tabs, function (tab) {
       tab.addEventListener('click', function () { switchTab(tab); });
     });

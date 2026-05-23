@@ -3,73 +3,78 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Chinese-Gregorian Calendar Dashboard</title>
+  <title>双历仪表板</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/solarlunar/dist/solarlunar.min.js"></script>
 </head>
 <body>
   <header class="app-header">
-    <h1>双历仪表板</h1>
-    <span class="app-subtitle">Chinese-Gregorian Calendar Dashboard</span>
+    <div class="header-row">
+      <div>
+        <h1>双历仪表板</h1>
+        <span class="app-subtitle">公历 · 农历 双历仪表板</span>
+      </div>
+      <button id="script-toggle" class="btn btn-script">繁體</button>
+    </div>
   </header>
 
   <main class="main-layout">
     <section id="calendar-section" class="card">
       <div class="calendar-nav">
-        <button id="prev-month" class="btn btn-icon" aria-label="Previous Month">&#9664;</button>
-        <h2 id="calendar-header">May 2026</h2>
-        <button id="next-month" class="btn btn-icon" aria-label="Next Month">&#9654;</button>
-        <button id="today-btn" class="btn btn-secondary">Today</button>
+        <button id="prev-month" class="btn btn-icon" aria-label="上一月">&#9664;</button>
+        <h2 id="calendar-header">2026年5月</h2>
+        <button id="next-month" class="btn btn-icon" aria-label="下一月">&#9654;</button>
+        <button id="today-btn" class="btn btn-secondary">今天</button>
       </div>
       <div id="calendar-grid" class="calendar-grid"></div>
       <div class="calendar-legend">
-        <span class="legend-item"><span class="chinese-month-indicator">四月</span> Chinese month start</span>
-        <span class="legend-item"><span class="chinese-leap-indicator">闰</span> Leap month</span>
+        <span class="legend-item"><span class="chinese-month-indicator">四月</span> <span class="legend-text-month">农历月初</span></span>
+        <span class="legend-item"><span class="chinese-leap-indicator">闰</span> <span class="legend-text-leap">闰月</span></span>
       </div>
     </section>
 
     <section id="converter-section" class="card">
-      <h2 class="section-title">Calendar Converter</h2>
+      <h2 class="section-title">日期转换</h2>
       <div class="converter-tabs">
-        <button class="tab active" data-panel="solar2lunar">Gregorian &rarr; Chinese</button>
-        <button class="tab" data-panel="lunar2solar">Chinese &rarr; Gregorian</button>
+        <button class="tab active" data-panel="solar2lunar">公历 &rarr; 农历</button>
+        <button class="tab" data-panel="lunar2solar">农历 &rarr; 公历</button>
       </div>
 
       <div id="panel-solar2lunar" class="converter-panel active">
-        <p class="panel-desc">Select a Western date to see its Chinese calendar equivalent.</p>
+        <p class="panel-desc">选择公历日期，查看对应农历信息。</p>
         <div class="form-row">
-          <label class="form-label" for="solar-date-input">Gregorian Date:</label>
+          <label class="form-label" for="solar-date-input">公历日期：</label>
           <input type="date" id="solar-date-input" class="form-input">
         </div>
-        <button id="convert-to-lunar" class="btn btn-primary">Convert</button>
+        <button id="convert-to-lunar" class="btn btn-primary">转换</button>
         <div id="result-solar2lunar" class="converter-result"></div>
       </div>
 
       <div id="panel-lunar2solar" class="converter-panel">
-        <p class="panel-desc">Input a Chinese calendar date to convert to the Western calendar.</p>
+        <p class="panel-desc">输入农历日期，转换为公历。</p>
         <div class="form-row">
-          <label class="form-label" for="lunar-year-input">Year:</label>
+          <label class="form-label" for="lunar-year-input">年份：</label>
           <input type="number" id="lunar-year-input" class="form-input form-input-narrow" value="2026" min="1900" max="2100">
         </div>
         <div class="form-row">
-          <label class="form-label" for="lunar-month-input">Month:</label>
+          <label class="form-label" for="lunar-month-input">月份：</label>
           <select id="lunar-month-input" class="form-input form-input-narrow"></select>
           <label class="checkbox-label" for="lunar-leap-input">
-            <input type="checkbox" id="lunar-leap-input"> Leap Month (<span class="chinese-leap-indicator">闰</span>)
+            <input type="checkbox" id="lunar-leap-input"> 闰月 (<span class="chinese-leap-indicator">闰</span>)
           </label>
         </div>
         <div class="form-row">
-          <label class="form-label" for="lunar-day-input">Day:</label>
+          <label class="form-label" for="lunar-day-input">日期：</label>
           <select id="lunar-day-input" class="form-input form-input-narrow"></select>
         </div>
-        <button id="convert-to-solar" class="btn btn-primary">Convert</button>
+        <button id="convert-to-solar" class="btn btn-primary">转换</button>
         <div id="result-lunar2solar" class="converter-result"></div>
       </div>
     </section>
   </main>
 
   <footer class="app-footer">
-    <p>Powered by <a href="https://www.npmjs.com/package/solarlunar" target="_blank" rel="noopener">solarlunar.js</a></p>
+    <p><span id="footer-tech">技术支持</span> <a href="https://www.npmjs.com/package/solarlunar" target="_blank" rel="noopener">solarlunar.js</a></p>
   </footer>
 
   <script src="script.js"></script>
