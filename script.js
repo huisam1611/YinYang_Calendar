@@ -14,7 +14,7 @@
     '无': '無', '对': '對', '应': '應', '为': '為',
   };
 
-  var state = { year: 0, month: 0 };
+  var state = { year: 0, month: 0, selectedDate: '' };
   var els = {};
   var SL = null;
   var useTraditional = false;
@@ -233,7 +233,7 @@
 
   function buildCell(year, month, day, isOther) {
     if (!SL) {
-      return '<div class="day-cell' + (isOther ? ' other-month' : '') + '"><span class="gregorian-date">' + day + '</span></div>';
+      return '<div class="day-cell' + (isOther ? ' other-month' : '') + '" data-year="' + year + '" data-month="' + month + '" data-day="' + day + '"><span class="gregorian-date">' + day + '</span></div>';
     }
 
     var lunar = SL.solar2lunar(year, month, day);
@@ -248,6 +248,7 @@
     if (isOther) classes += ' other-month';
     if (isWeekend && !isOther) classes += ' weekend';
     if (isToday) classes += ' today';
+    if (dateStr === state.selectedDate) classes += ' selected';
 
     var chineseText = lunar.dayCn;
     var chineseClass = 'chinese-date';
@@ -258,7 +259,7 @@
     if (lunar.isLeap) chineseClass += ' leap-month';
     chineseText = convertChinese(chineseText);
 
-    return '<div class="' + classes + '">' +
+    return '<div class="' + classes + '" data-year="' + year + '" data-month="' + month + '" data-day="' + day + '">' +
       '<span class="gregorian-date">' + day + '</span>' +
       '<span class="' + chineseClass + '">' + chineseText + '</span></div>';
   }
@@ -350,10 +351,31 @@
     if (els.panels.lunar2solar) els.panels.lunar2solar.classList.toggle('active', tabId === 'lunar2solar');
   }
 
+  function selectDate(year, month, day) {
+    var m = String(month).padStart(2, '0');
+    var d = String(day).padStart(2, '0');
+    state.selectedDate = year + '-' + month + '-' + day;
+    if (els.solarDateInput) els.solarDateInput.value = year + '-' + m + '-' + d;
+    renderCalendar();
+    convertSolarToLunar();
+  }
+
   function bindEvents() {
     if (els.prevMonth) els.prevMonth.addEventListener('click', prevMonth);
     if (els.nextMonth) els.nextMonth.addEventListener('click', nextMonth);
     if (els.todayBtn) els.todayBtn.addEventListener('click', goToToday);
+    if (els.calendarGrid) els.calendarGrid.addEventListener('click', function (e) {
+      var cell = e.target.closest('.day-cell');
+      if (!cell) return;
+      var year = parseInt(cell.dataset.year, 10);
+      var month = parseInt(cell.dataset.month, 10);
+      var day = parseInt(cell.dataset.day, 10);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        state.year = year;
+        state.month = month;
+        selectDate(year, month, day);
+      }
+    });
     if (els.convertToLunar) els.convertToLunar.addEventListener('click', convertSolarToLunar);
     if (els.convertToSolar) els.convertToSolar.addEventListener('click', convertLunarToSolar);
     if (els.solarDateInput) els.solarDateInput.addEventListener('keydown', function (e) {
