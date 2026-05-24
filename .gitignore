@@ -1,3 +1,6 @@
 node_modules/
 *.log
 package-lock.json
+prompt.md
+skills/
+AGENTS.md
