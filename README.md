@@ -1,44 +1,103 @@
-# 双历仪表板 — Dual Chinese-Gregorian Calendar Dashboard
+# 陰陽曆儀表板 / Dual Calendar Dashboard
 
-一个响应式的单页 Web 应用，同时展示公历与中国传统农历（阴历），并提供精确的双向日期转换功能。
+一個輕量、響應式的公曆與農曆月曆工具，可在瀏覽器中直接使用。
 
-## 功能
+A lightweight, responsive Gregorian–Chinese lunar calendar that runs directly in the browser.
 
-- **双历月视图** — 7 列日历网格，每个日期同时显示公历日号与农历日期（初一显示农历月份名，如`四月`）
-- **公历 → 农历** — 选择公历日期，输出完整农历信息（干支年、生肖、农历月日）
-- **农历 → 公历** — 输入农历年、月、日，输出对应的公历日期
-- **简繁切换** — 右上角一键切换简体/繁体中文，偏好自动保存至 localStorage
-- **闰月自动识别** — 农历转换器自动判断所选月份是否为闰月，仅在存在歧义时显示闰月选项
-- **跳转到月** — 转换结果中一键跳转到对应月份
-- **今日高亮** — 当前日期具有醒目的视觉标识
-- **全中文界面** — 所有界面文字、错误提示均为中文
-- **响应式设计** — 适配桌面与移动端
+[繁體中文](#繁體中文) · [English](#english)
 
-## 技术栈
+---
 
-- HTML5 语义化结构
-- CSS3（Grid / Flexbox、自定义属性、响应式布局）
-- 原生 JavaScript（ES6+）
-- [solarlunar.js](https://www.npmjs.com/package/solarlunar)（通过 CDN `unpkg` 加载）
-- 简繁汉字映射表（覆盖日历相关常用字）
+## 繁體中文
 
-## 使用方式
+### 功能
 
-直接打开 `index.html` 即可运行（需联网加载 solarlunar.js）。
+- 同時顯示公曆日期與農曆日期的月曆
+- 公曆與農曆雙向日期轉換
+- 自動識別並顯示閏月選項
+- 從轉換結果跳轉至對應月份
+- 簡體／繁體中文切換，並在瀏覽器中保存偏好
+- 支援方向鍵操作日期，以及頁籤鍵盤導覽
+- 桌面雙欄、平板與手機單欄的響應式版面
+- 支援日期範圍：`1900-01-31` 至 `2100-12-31`
 
-无需构建工具，无需 npm 安装。
+### 使用方式
 
-## 设计
+1. 下載或複製此專案。
+2. 直接用瀏覽器開啟 `index.html`。
+3. 保持網路連線，以便從 CDN 載入 `solarlunar.js`。
 
-- 配色：中性灰底（`#f8f9fa`），主色调为黛绿（`#2e7d32`）与朱红（`#c62828`）
-- 周末列使用柔和底色区分
-- 农历初一以朱红色标注月份名
+此專案不需要 npm、建置工具或後端服務。
 
-## 测试用例
+### 專案結構
 
-| 输入 | 预期输出 |
-|------|----------|
-| 公历 `2026-05-21` | `丙午年(马) 四月 初五` |
-| 农历 2026 年 4 月 5 日（非闰） | `Thursday, May 21, 2026` |
-| 公历 `2025-07-25` | `乙巳年(蛇) 闰六月 初一` |
-| 农历 2025 年 6 月 25 日（闰月） | `Tuesday, July 29, 2025` |
+```text
+YinYang_Calendar/
+├── index.html   # 頁面結構
+├── styles.css   # 版面、色彩與響應式樣式
+├── script.js    # 月曆、轉換與互動邏輯
+└── README.md
+```
+
+### 技術
+
+- HTML5
+- CSS Grid、Flexbox 與自訂屬性
+- 原生 JavaScript
+- [solarlunar.js](https://www.npmjs.com/package/solarlunar)
+
+### 無障礙功能
+
+- 日期格可使用鍵盤方向鍵操作
+- 轉換頁籤支援方向鍵、Home 與 End
+- 動態結果與月份標題提供螢幕閱讀器通知
+- 互動元件具有清楚的焦點樣式與最小觸控尺寸
+- 遵循系統的減少動態效果偏好
+
+---
+
+## English
+
+### Features
+
+- Monthly calendar showing Gregorian and Chinese lunar dates together
+- Two-way Gregorian and lunar date conversion
+- Automatic leap-month detection
+- Jump from a conversion result to the corresponding calendar month
+- Simplified/Traditional Chinese toggle with saved browser preference
+- Arrow-key date navigation and keyboard-accessible tabs
+- Responsive two-column desktop and single-column mobile layouts
+- Supported date range: `1900-01-31` to `2100-12-31`
+
+### Usage
+
+1. Download or clone this project.
+2. Open `index.html` in a browser.
+3. Keep an internet connection available so `solarlunar.js` can load from the CDN.
+
+No npm installation, build process, or backend service is required.
+
+### Project Structure
+
+```text
+YinYang_Calendar/
+├── index.html   # Page structure
+├── styles.css   # Layout, colors, and responsive styles
+├── script.js    # Calendar, conversion, and interaction logic
+└── README.md
+```
+
+### Technology
+
+- HTML5
+- CSS Grid, Flexbox, and custom properties
+- Vanilla JavaScript
+- [solarlunar.js](https://www.npmjs.com/package/solarlunar)
+
+### Accessibility
+
+- Arrow-key navigation between calendar dates
+- Arrow keys, Home, and End support for conversion tabs
+- Screen-reader announcements for dynamic results and month changes
+- Visible focus states and touch-friendly control sizes
+- Reduced-motion preference support
