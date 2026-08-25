@@ -1,21 +1,21 @@
 :root {
-  --bg: #f8f9fa;
-  --surface: #ffffff;
-  --text: #1a1a2e;
-  --text-secondary: #5a5a7a;
-  --jade: #2e7d32;
-  --jade-light: #e8f5e9;
-  --jade-dark: #1b5e20;
-  --red: #c62828;
-  --red-light: #ffebee;
-  --red-dark: #8e0000;
-  --border: #e0e0e0;
-  --weekend-bg: #f5f0eb;
-  --today-bg: #e8f5e9;
-  --today-border: #2e7d32;
+  --bg: #f4f1e8;
+  --surface: #fffdf8;
+  --text: #1f2a25;
+  --text-secondary: #5f6b64;
+  --jade: #2f6b57;
+  --jade-light: #e7f0eb;
+  --jade-dark: #1d4f3f;
+  --red: #a5463d;
+  --red-light: #f7ebe7;
+  --red-dark: #7b2f29;
+  --border: #d9ded6;
+  --weekend-bg: #f5efe4;
+  --today-bg: #e9f2ec;
+  --today-border: #2f6b57;
   --radius: 8px;
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --shadow: 0 8px 24px rgba(36,53,46,0.08);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Noto Sans SC", "Microsoft YaHei", sans-serif;
 }
 
 *, *::before, *::after {
@@ -42,8 +42,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: 820px;
+  max-width: 1120px;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 .app-header h1 {
@@ -69,7 +70,8 @@ body {
   font-size: 0.85rem;
   cursor: pointer;
   font-family: inherit;
-  transition: background 0.2s;
+  min-height: 44px;
+  transition: background-color 0.2s, border-color 0.2s;
   white-space: nowrap;
 }
 
@@ -78,7 +80,11 @@ body {
 }
 
 .main-layout {
-  max-width: 820px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+  align-items: start;
+  gap: 20px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: 20px 16px 40px;
 }
@@ -88,7 +94,7 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .section-title {
@@ -102,9 +108,8 @@ body {
 .calendar-nav {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .calendar-nav h2 {
@@ -112,7 +117,7 @@ body {
   font-weight: 600;
   flex: 1;
   text-align: center;
-  min-width: 180px;
+  min-width: 0;
 }
 
 .btn {
@@ -126,7 +131,8 @@ body {
   color: var(--text);
   font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  min-height: 44px;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
   font-family: inherit;
   line-height: 1;
 }
@@ -141,10 +147,15 @@ body {
 }
 
 .btn-icon {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   font-size: 1rem;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .btn-primary {
@@ -190,6 +201,7 @@ body {
 }
 
 .day-cell {
+  border: 0;
   background: var(--surface);
   min-height: 80px;
   padding: 4px 6px;
@@ -197,8 +209,11 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   position: relative;
-  transition: background 0.15s;
-  cursor: default;
+  transition: background-color 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  text-align: left;
 }
 
 .day-cell:hover {
@@ -214,7 +229,7 @@ body {
 }
 
 .day-cell.weekend:hover {
-  background: #ede7e0;
+  background: #eee6d9;
 }
 
 .day-cell.today {
@@ -223,8 +238,18 @@ body {
 }
 
 .day-cell.selected {
-  background: #c8e6c9;
+  background: #d6e8de;
   box-shadow: inset 0 0 0 2px var(--jade-dark);
+}
+
+.day-cell.selected .gregorian-date {
+  font-weight: 800;
+}
+
+.day-cell:disabled,
+.day-cell.unsupported-date {
+  cursor: not-allowed;
+  opacity: 0.35;
 }
 
 .gregorian-date {
@@ -293,13 +318,14 @@ body {
 .tab {
   flex: 1;
   padding: 8px 12px;
+  min-height: 44px;
   border: none;
   border-radius: 6px;
   background: transparent;
   color: var(--text-secondary);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
   font-family: inherit;
   text-align: center;
 }
@@ -321,6 +347,10 @@ body {
 
 .converter-panel.active {
   display: block;
+}
+
+.converter-panel[hidden] {
+  display: none;
 }
 
 .panel-desc {
@@ -345,6 +375,7 @@ body {
 }
 
 .form-input {
+  min-height: 44px;
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -358,7 +389,7 @@ body {
 .form-input:focus {
   outline: none;
   border-color: var(--jade);
-  box-shadow: 0 0 0 3px rgba(46,125,50,0.12);
+  box-shadow: 0 0 0 3px rgba(47,107,87,0.14);
 }
 
 .form-input-narrow {
@@ -368,6 +399,7 @@ body {
 .checkbox-label {
   display: flex;
   align-items: center;
+  min-height: 44px;
   gap: 4px;
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -389,6 +421,10 @@ body {
   font-size: 1rem;
   min-height: 48px;
   word-break: break-all;
+}
+
+.converter-result:empty {
+  display: none;
 }
 
 .converter-result .result-label {
@@ -433,6 +469,17 @@ body {
   text-decoration: underline;
 }
 
+@media (max-width: 960px) {
+  .main-layout {
+    display: block;
+    max-width: 820px;
+  }
+
+  .card {
+    margin-bottom: 20px;
+  }
+}
+
 @media (max-width: 600px) {
   .app-header h1 {
     font-size: 1.3rem;
@@ -444,7 +491,8 @@ body {
 
   .calendar-nav h2 {
     font-size: 1.1rem;
-    min-width: 140px;
+    min-width: 0;
+    white-space: nowrap;
   }
 
   .day-cell {
@@ -466,5 +514,33 @@ body {
 
   .form-input-narrow {
     max-width: 100px;
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-nav {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 44px auto;
+    gap: 6px;
+  }
+
+  .calendar-nav .btn-secondary {
+    padding-inline: 10px;
+  }
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+label:has(input:focus-visible) {
+  outline: 3px solid rgba(47, 107, 87, 0.42);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

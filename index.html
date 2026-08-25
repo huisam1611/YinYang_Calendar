@@ -22,7 +22,7 @@
     <section id="calendar-section" class="card">
       <div class="calendar-nav">
         <button id="prev-month" class="btn btn-icon" aria-label="上一月">&#9664;</button>
-        <h2 id="calendar-header">2026年5月</h2>
+        <h2 id="calendar-header" aria-live="polite">2026年5月</h2>
         <button id="next-month" class="btn btn-icon" aria-label="下一月">&#9654;</button>
         <button id="today-btn" class="btn btn-secondary">今天</button>
       </div>
@@ -35,22 +35,22 @@
 
     <section id="converter-section" class="card">
       <h2 class="section-title">日期转换</h2>
-      <div class="converter-tabs">
-        <button class="tab active" data-panel="solar2lunar">公历 &rarr; 农历</button>
-        <button class="tab" data-panel="lunar2solar">农历 &rarr; 公历</button>
+      <div class="converter-tabs" role="tablist" aria-label="日期转换方向">
+        <button id="tab-solar2lunar" class="tab active" data-panel="solar2lunar" role="tab" aria-controls="panel-solar2lunar" aria-selected="true" tabindex="0">公历 &rarr; 农历</button>
+        <button id="tab-lunar2solar" class="tab" data-panel="lunar2solar" role="tab" aria-controls="panel-lunar2solar" aria-selected="false" tabindex="-1">农历 &rarr; 公历</button>
       </div>
 
-      <div id="panel-solar2lunar" class="converter-panel active">
+      <div id="panel-solar2lunar" class="converter-panel active" role="tabpanel" aria-labelledby="tab-solar2lunar" tabindex="0">
         <p class="panel-desc">选择公历日期，查看对应农历信息。</p>
         <div class="form-row">
           <label class="form-label" for="solar-date-input">公历日期：</label>
-          <input type="date" id="solar-date-input" class="form-input">
+          <input type="date" id="solar-date-input" class="form-input" min="1900-01-31" max="2100-12-31">
         </div>
         <button id="convert-to-lunar" class="btn btn-primary">转换</button>
-        <div id="result-solar2lunar" class="converter-result"></div>
+        <div id="result-solar2lunar" class="converter-result" aria-live="polite"></div>
       </div>
 
-      <div id="panel-lunar2solar" class="converter-panel">
+      <div id="panel-lunar2solar" class="converter-panel" role="tabpanel" aria-labelledby="tab-lunar2solar" tabindex="0" hidden>
         <p class="panel-desc">输入农历日期，转换为公历。</p>
         <div class="form-row">
           <label class="form-label" for="lunar-year-input">年份：</label>
@@ -60,7 +60,7 @@
           <label class="form-label" for="lunar-month-input">月份：</label>
           <select id="lunar-month-input" class="form-input form-input-narrow"></select>
           <label class="checkbox-label" for="lunar-leap-input">
-            <input type="checkbox" id="lunar-leap-input"> 闰月 (<span class="chinese-leap-indicator">闰</span>)
+            <input type="checkbox" id="lunar-leap-input"> <span class="lunar-leap-text">闰月 (<span class="chinese-leap-indicator">闰</span>)</span>
           </label>
         </div>
         <div class="form-row">
@@ -68,7 +68,7 @@
           <select id="lunar-day-input" class="form-input form-input-narrow"></select>
         </div>
         <button id="convert-to-solar" class="btn btn-primary">转换</button>
-        <div id="result-lunar2solar" class="converter-result"></div>
+        <div id="result-lunar2solar" class="converter-result" aria-live="polite"></div>
       </div>
     </section>
   </main>
