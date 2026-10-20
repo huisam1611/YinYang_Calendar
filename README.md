@@ -18,7 +18,7 @@ A lightweight, responsive Gregorian–Chinese lunar calendar that runs directly 
 - 從轉換結果跳轉至對應月份
 - 簡體／繁體中文切換，並在瀏覽器中保存偏好
 - 支援方向鍵操作日期，以及頁籤鍵盤導覽
-- 桌面雙欄、平板與手機單欄的響應式版面
+- 桌面以月曆為主、右側顯示所選日期與轉換器；手機先顯示日期對照，轉換區可展開
 - 支援日期範圍：`1900-01-31` 至 `2100-12-31`
 
 ### 使用方式
@@ -54,6 +54,12 @@ YinYang_Calendar/
 - 互動元件具有清楚的焦點樣式與最小觸控尺寸
 - 遵循系統的減少動態效果偏好
 
+### 介面回歸測試
+
+測試環境需有 Node.js、Playwright 與 Chrome。執行 `node tests/ui-smoke.cjs`，測試會自動啟動並關閉本機伺服器。
+
+測試涵蓋桌面／手機配置、雙向轉換、閏月、簡繁切換、鍵盤選日及日期邊界。一般使用不需要這些測試工具。
+
 ---
 
 ## English
@@ -66,7 +72,7 @@ YinYang_Calendar/
 - Jump from a conversion result to the corresponding calendar month
 - Simplified/Traditional Chinese toggle with saved browser preference
 - Arrow-key date navigation and keyboard-accessible tabs
-- Responsive two-column desktop and single-column mobile layouts
+- Calendar-first desktop layout with a selected-date sidebar; mobile date summary and expandable converter
 - Supported date range: `1900-01-31` to `2100-12-31`
 
 ### Usage
@@ -101,3 +107,9 @@ YinYang_Calendar/
 - Screen-reader announcements for dynamic results and month changes
 - Visible focus states and touch-friendly control sizes
 - Reduced-motion preference support
+
+### UI Regression Check
+
+The test environment requires Node.js, Playwright, and Chrome. Run `node tests/ui-smoke.cjs`; the check starts and stops its own local server.
+
+The check covers desktop/mobile layouts, both conversion directions, leap months, language switching, keyboard selection, and date boundaries. These test tools are not required for normal use.

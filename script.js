@@ -12,7 +12,7 @@
     '库': '庫', '载': '載', '败': '敗', '错': '錯', '误': '誤',
     '网': '網', '络': '絡', '连': '連', '后': '後',
     '无': '無', '对': '對', '应': '應', '为': '為',
-    '内': '內', '围': '圍', '暂': '暫', '调': '調', '试': '試',
+    '内': '內', '围': '圍', '暂': '暫', '调': '調', '试': '試', '与': '與',
   };
 
   var MIN_SOLAR = { year: 1900, month: 1, day: 31 };
@@ -99,8 +99,10 @@
     try { localStorage.setItem('calendar-script', useTraditional ? 't' : 's'); } catch (e) {}
     updateStaticText();
     renderCalendar();
-    if (els.resultSolar2Lunar && els.resultSolar2Lunar.textContent.trim()) convertSolarToLunar();
-    if (els.resultLunar2Solar && els.resultLunar2Solar.textContent.trim()) convertLunarToSolar();
+    var selected = parseDateValue(state.selectedDate);
+    if (selected) updateSelectedSummary(selected.year, selected.month, selected.day);
+    if (els.resultSolar2Lunar && els.resultSolar2Lunar.textContent.trim()) convertSolarToLunar(false);
+    if (els.resultLunar2Solar && els.resultLunar2Solar.textContent.trim()) convertLunarToSolar(false);
   }
 
   function resolveLunarLib() {
@@ -112,7 +114,7 @@
 
   function updateStaticText() {
     document.documentElement.lang = useTraditional ? 'zh-TW' : 'zh-CN';
-    document.title = convertChinese('双历仪表板');
+    document.title = convertChinese('双历日历');
     if (els.scriptToggle) els.scriptToggle.textContent = useTraditional ? '简体' : '繁體';
     if (els.legendMonthStart) els.legendMonthStart.textContent = convertChinese('农历月初');
     if (els.legendLeap) els.legendLeap.textContent = convertChinese('闰月');
@@ -139,10 +141,10 @@
     if (els.convertToSolar) els.convertToSolar.textContent = convertChinese('转换');
     if (els.prevMonth) els.prevMonth.setAttribute('aria-label', convertChinese('上一月'));
     if (els.nextMonth) els.nextMonth.setAttribute('aria-label', convertChinese('下一月'));
-    if (els.title) els.title.textContent = convertChinese('双历仪表板');
-    if (els.subtitle) els.subtitle.textContent = convertChinese('公历 · 农历 双历仪表板');
-    if (els.footerTech) els.footerTech.textContent = convertChinese('技术支持');
+    if (els.title) els.title.textContent = convertChinese('双历日历');
+    if (els.subtitle) els.subtitle.textContent = convertChinese('公历与农历对照');
     if (els.sectionTitle) els.sectionTitle.textContent = convertChinese('日期转换');
+    if (els.selectedSummary) els.selectedSummary.setAttribute('aria-label', convertChinese('已选日期'));
   }
 
   function init() {
@@ -155,6 +157,7 @@
     var today = new Date();
     state.year = today.getFullYear();
     state.month = today.getMonth() + 1;
+    setConverterDisclosure();
     bindEvents();
     setDefaultSolarDate();
     renderCalendar();
@@ -163,6 +166,11 @@
 
   function cacheElements() {
     els.calendarGrid = document.getElementById('calendar-grid');
+    els.summarySolar = document.getElementById('summary-solar');
+    els.summaryLunar = document.getElementById('summary-lunar');
+    els.summaryYear = document.getElementById('summary-year');
+    els.selectedSummary = document.getElementById('selected-summary');
+    els.converter = document.getElementById('converter-section');
     els.calendarHeader = document.getElementById('calendar-header');
     els.prevMonth = document.getElementById('prev-month');
     els.nextMonth = document.getElementById('next-month');
@@ -193,7 +201,6 @@
     els.title = document.querySelector('h1');
     els.subtitle = document.querySelector('.app-subtitle');
     els.sectionTitle = document.querySelector('.section-title');
-    els.footerTech = document.getElementById('footer-tech');
     els.tabs = document.querySelectorAll('.tab');
     els.panels = {
       solar2lunar: document.getElementById('panel-solar2lunar'),
@@ -248,6 +255,45 @@
     var dateKey = formatDateKey(today.year, today.month, today.day);
     els.solarDateInput.value = dateKey;
     state.selectedDate = dateKey;
+    updateSelectedSummary(today.year, today.month, today.day);
+  }
+
+  function updateSelectedSummary(year, month, day) {
+    if (!els.selectedSummary) return;
+    var date = new Date(year, month - 1, day);
+    var locale = useTraditional ? 'zh-TW' : 'zh-CN';
+    var solar = date.toLocaleDateString(locale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    var lunar = SL && SL.solar2lunar(year, month, day);
+    if (els.summarySolar) els.summarySolar.textContent = convertChinese(solar);
+    if (els.summaryLunar) els.summaryLunar.textContent = lunar ? convertChinese(lunar.monthCn + lunar.dayCn) : '—';
+    if (els.summaryYear) els.summaryYear.textContent = lunar ?
+      convertChinese((lunar.gzYear || '') + '年 · ' + (lunar.animal || '')) : '';
+  }
+
+  function syncSelectedDate(year, month, day, shouldFocus) {
+    if (!isSupportedDate(year, month, day)) return false;
+    var dateKey = formatDateKey(year, month, day);
+    var changed = dateKey !== state.selectedDate || year !== state.year || month !== state.month;
+    state.year = year;
+    state.month = month;
+    state.selectedDate = dateKey;
+    if (els.solarDateInput) els.solarDateInput.value = dateKey;
+    updateSelectedSummary(year, month, day);
+    if (changed || shouldFocus) renderCalendar(shouldFocus ? dateKey : '');
+    return changed;
+  }
+
+  function setConverterDisclosure() {
+    if (!els.converter) return;
+    var desktop = window.matchMedia('(min-width: 901px)');
+    var disclosure = els.converter.querySelector('summary');
+    var update = function (event) {
+      els.converter.open = event.matches;
+      if (disclosure) disclosure.tabIndex = event.matches ? -1 : 0;
+    };
+    update(desktop);
+    if (desktop.addEventListener) desktop.addEventListener('change', update);
+    else desktop.addListener(update);
   }
 
   function normalizeDate(year, month) {
@@ -405,7 +451,8 @@
     }
   }
 
-  function convertSolarToLunar() {
+  function convertSolarToLunar(syncSelection) {
+    if (syncSelection === undefined) syncSelection = true;
     if (!SL) { setResult('result-solar2lunar', convertChinese('库未加载，请检查网络连接。')); return; }
     var val = els.solarDateInput ? els.solarDateInput.value : '';
     if (!val) { setResult('result-solar2lunar', convertChinese('请选择日期。')); return; }
@@ -416,6 +463,7 @@
     }
     var lunar = SL.solar2lunar(parts.year, parts.month, parts.day);
     if (!lunar || !lunar.dayCn) { setResult('result-solar2lunar', convertChinese('转换失败，请检查日期后再试。')); return; }
+    if (syncSelection) syncSelectedDate(parts.year, parts.month, parts.day, false);
     var gzYear = convertChinese(lunar.gzYear);
     var animal = convertChinese(lunar.animal);
     var monthDay = convertChinese(lunar.monthCn + lunar.dayCn);
@@ -428,7 +476,8 @@
     bindJumpBtn('result-solar2lunar');
   }
 
-  function convertLunarToSolar() {
+  function convertLunarToSolar(syncSelection) {
+    if (syncSelection === undefined) syncSelection = true;
     if (!SL) { setResult('result-lunar2solar', convertChinese('库未加载，请检查网络连接。')); return; }
     var y = parseInt(els.lunarYearInput ? els.lunarYearInput.value : '', 10);
     var m = parseInt(els.lunarMonthInput ? els.lunarMonthInput.value : '', 10);
@@ -439,6 +488,10 @@
     if (!solar || !solar.cDay || !isSupportedDate(solar.cYear, solar.cMonth, solar.cDay)) {
       setResult('result-lunar2solar', convertChinese('转换失败，指定的农历日期可能不存在，请调整日期后再试。'));
       return;
+    }
+    if (syncSelection) {
+      syncSelectedDate(solar.cYear, solar.cMonth, solar.cDay, false);
+      convertSolarToLunar();
     }
     var dateObj = new Date(solar.cYear, solar.cMonth - 1, solar.cDay);
     var locale = useTraditional ? 'zh-TW' : 'zh-CN';
@@ -465,8 +518,11 @@
         state.year = parseInt(this.dataset.jumpYear, 10);
         state.month = parseInt(this.dataset.jumpMonth, 10);
         renderCalendar();
-        var section = document.getElementById('calendar-section');
-        if (section) section.scrollIntoView({ behavior: 'smooth' });
+        var calendarNav = document.querySelector('.calendar-nav');
+        if (calendarNav) {
+          var behavior = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+          calendarNav.scrollIntoView({ behavior: behavior, block: 'start' });
+        }
       });
     }
   }
@@ -497,12 +553,7 @@
 
   function selectDate(year, month, day, shouldFocus) {
     if (!isSupportedDate(year, month, day)) return;
-    var dateKey = formatDateKey(year, month, day);
-    state.year = year;
-    state.month = month;
-    state.selectedDate = dateKey;
-    if (els.solarDateInput) els.solarDateInput.value = dateKey;
-    renderCalendar(shouldFocus ? dateKey : '');
+    syncSelectedDate(year, month, day, shouldFocus);
     convertSolarToLunar();
   }
 
